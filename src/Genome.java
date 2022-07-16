@@ -51,6 +51,9 @@ public class Genome {
         }
         return doubles;
     }
+    private Double fix(double old, double _new, double speed) {
+        return (1 - speed)*old + _new*speed;
+    }
     public Genome cross(Stream<Genome> genomeStream) {
         double speedK = Math.random() / 5 + 0.7;// 0.7..0.9
         double lightK = Math.random() / 10 + 0.8;// 0.8..0.9
@@ -63,12 +66,12 @@ public class Genome {
         double sumSpeed = speedK * speed_evolution;
         double sumLight = lightK * light_need;
         while (randDoublesSpeed.hasNext()){
-            sumSpeed += randDoublesSpeed.next() * randDoublesSpeed_.next();
-            sumLight += randDoublesK.next() * randDoublesK_.next();
+            sumSpeed += randDoublesSpeed.next() * speed_evolution * randDoublesSpeed_.next();
+            sumLight += randDoublesK.next() * speed_evolution * randDoublesK_.next();
         }
         Genome newGenome = createGenome();
-        newGenome.speed_evolution = sumSpeed;
-        newGenome.light_need = sumLight;
+        newGenome.speed_evolution = fix(speed_evolution, sumSpeed, speed_evolution);
+        newGenome.light_need = fix(light_need, sumLight, speed_evolution);
         crossDna(genArr, newGenome, cnt);
         return newGenome;
     }
@@ -86,7 +89,7 @@ public class Genome {
             while (s1.hasNext()){
                 sum += s1.next() * s2.next();
             }
-            newGenome.dna[i] = sum;
+            newGenome.dna[i] = fix(dna[i], sum, speed_evolution);
         }
     }
 }
